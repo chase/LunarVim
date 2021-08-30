@@ -1,5 +1,6 @@
 return {
   -- Packer can manage itself as an optional plugin
+  { "lewis6991/impatient.nvim" },
   { "wbthomason/packer.nvim" },
   { "neovim/nvim-lspconfig" },
   { "tamago324/nlsp-settings.nvim" },
@@ -138,7 +139,7 @@ return {
   },
 
   {
-    "romgrk/barbar.nvim",
+    "~/OSS/barbar.nvim",
     config = function()
       require("core.bufferline").setup()
     end,
