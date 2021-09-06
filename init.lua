@@ -5,6 +5,9 @@ end
 
 require("bootstrap"):init()
 
+_G.PLENARY_DEBUG = false -- Plenary destroys cache with this undocumented flag set to true by default
+require("impatient").enable_profile()
+
 local config = require "config"
 -- config:init()
 config:load()
