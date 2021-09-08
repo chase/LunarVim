@@ -1,6 +1,5 @@
 return {
   -- Packer can manage itself as an optional plugin
-  { "lewis6991/impatient.nvim" },
   { "wbthomason/packer.nvim" },
   { "neovim/nvim-lspconfig" },
   { "tamago324/nlsp-settings.nvim" },
