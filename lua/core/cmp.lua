@@ -130,12 +130,7 @@ M.config = function()
       ["<C-Space>"] = cmp.mapping.complete(),
       ["<C-e>"] = cmp.mapping.close(),
       ["<CR>"] = cmp.mapping(function(fallback)
-        local completed = false
-        completed = vim.fn.pumvisible() == 0
-
-        completed = completed or not cmp.confirm(lvim.builtin.cmp.confirm_opts)
-
-        if not completed then
+        if vim.fn.pumvisible() ~= 0 and cmp.confirm(lvim.builtin.cmp.confirm_opts) then
           return
         end
 
