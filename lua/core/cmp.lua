@@ -29,10 +29,28 @@ M.config = function()
   if not status_luasnip_ok then
     return
   end
+  local current_buf = vim.api.nvim_get_current_buf
+  local win_get_cursor = vim.api.nvim_win_get_cursor
+
+  local function inside_snippet()
+    if not luasnip.session.current_nodes then
+      return false
+    end
+
+    local node = luasnip.session.current_nodes[current_buf()]
+    if not node then
+      return false
+    end
+
+    local snip_begin_pos, snip_end_pos = node.parent.snippet.mark:pos_begin_end()
+    local pos = win_get_cursor(0)
+    return pos[1] >= snip_begin_pos[1] and pos[1] <= snip_end_pos[1]
+  end
+
   lvim.builtin.cmp = {
     confirm_opts = {
       behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
+      select = false,
     },
     formatting = {
       format = function(entry, vim_item)
@@ -83,7 +101,7 @@ M.config = function()
       ["<Tab>"] = cmp.mapping(function()
         if vim.fn.pumvisible() == 1 then
           vim.fn.feedkeys(T "<down>", "n")
-        elseif luasnip.expand_or_jumpable() then
+        elseif luasnip.expandable() or (inside_snippet() and luasnip.jumpable()) then
           vim.fn.feedkeys(T "<Plug>luasnip-expand-or-jump", "")
         elseif check_backspace() then
           vim.fn.feedkeys(T "<Tab>", "n")
@@ -99,8 +117,8 @@ M.config = function()
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if vim.fn.pumvisible() == 1 then
           vim.fn.feedkeys(T "<up>", "n")
-        elseif luasnip.jumpable(-1) then
-          vim.fn.feedkeys(T "<Plug>luasnip-jump-prev", "")
+        elseif inside_snippet() and luasnip.jumpable(-1) then
+          luasnip.jump(-1)
         else
           fallback()
         end
@@ -112,12 +130,19 @@ M.config = function()
       ["<C-Space>"] = cmp.mapping.complete(),
       ["<C-e>"] = cmp.mapping.close(),
       ["<CR>"] = cmp.mapping(function(fallback)
-        if not require("cmp").confirm(lvim.builtin.cmp.confirm_opts) then
-          if luasnip.jumpable() then
-            vim.fn.feedkeys(T "<Plug>luasnip-jump-next", "")
-          else
-            fallback()
-          end
+        local completed = false
+        completed = vim.fn.pumvisible() == 0
+
+        completed = completed or not cmp.confirm(lvim.builtin.cmp.confirm_opts)
+
+        if not completed then
+          return
+        end
+
+        if inside_snippet() and luasnip.jumpable() then
+          luasnip.jump(1)
+        else
+          fallback()
         end
       end),
     },
