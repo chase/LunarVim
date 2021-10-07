@@ -7,7 +7,7 @@ return {
   { "antoinemadec/FixCursorHold.nvim" }, -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
   {
     "kabouzeid/nvim-lspinstall",
-    event = "VimEnter",
+    cmd = {"LspInstall", "LspUninstall"},
     config = function()
       local lspinstall = require "core.lspinstall"
       lspinstall.setup()
